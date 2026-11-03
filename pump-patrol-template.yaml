@@ -106,7 +106,6 @@ binary_sensor:
     name: "Pump State"
     icon: "mdi:pump"
     device_class: running
-    update_interval: 1s
     lambda: |-
       if (id(calibrated_pump_amps).state >= ${running_threshold}) {
         return true;
