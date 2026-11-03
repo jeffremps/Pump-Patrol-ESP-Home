@@ -1,15 +1,20 @@
-# base_pump_controller.yaml
 substitutions:
-  # Standardized input names with default fallback strings
-  input_1_name: "Input 1"
-  input_2_name: "Input 2"
-  input_3_name: "Input 3"
-  input_voltage: "120.0"
-
-  # Alert LED Routing Control (Defaults: Only Input 1 triggers it)
+  # Input 1
+  input_1_internal: "false" # Changed from enabled to internal to fix parsing logic
   input_1_triggers_alert: "true"
+  input_1_name: "Tank High"
+
+  # Input 2
+  input_2_internal: "true"
   input_2_triggers_alert: "false"
+  input_2_name: "Input 2"
+  
+  # Input 3
+  input_3_internal: "true"
   input_3_triggers_alert: "false"
+  input_3_name: "Input 3"
+  
+  input_voltage: "120.0"
 
 esphome:
   name: ${device_name}
@@ -66,6 +71,8 @@ binary_sensor:
   # Input 1 (GPIO 32)
   - platform: gpio
     name: ${input_1_name}
+    internal: ${input_1_internal}
+    id: input_1_pin
     pin: 
       number: GPIO32
       inverted: true
@@ -85,7 +92,13 @@ binary_sensor:
     on_release:
       - if:
           condition:
-            - lambda: 'return ${input_1_triggers_alert};'
+            # Smart Clear: Only turn off the light if Input 1 is allowed to touch it AND no other alert pins are currently active
+            - lambda: |-
+                if (${input_1_triggers_alert}) {
+                  bool other_alert_active = (id(input_2_pin).state && ${input_2_triggers_alert}) || (id(input_3_pin).state && ${input_3_triggers_alert});
+                  return !other_alert_active; 
+                }
+                return false;
           then:
             - switch.turn_off: alert_led
 
@@ -103,6 +116,8 @@ binary_sensor:
   # Input 2 (GPIO 33)
   - platform: gpio
     name: ${input_2_name}
+    internal: ${input_2_internal}
+    id: input_2_pin
     pin:
       number: GPIO33
       inverted: true
@@ -122,13 +137,20 @@ binary_sensor:
     on_release:
       - if:
           condition:
-            - lambda: 'return ${input_2_triggers_alert};'
+            - lambda: |-
+                if (${input_2_triggers_alert}) {
+                  bool other_alert_active = (id(input_1_pin).state && ${input_1_triggers_alert}) || (id(input_3_pin).state && ${input_3_triggers_alert});
+                  return !other_alert_active;
+                }
+                return false;
           then:
             - switch.turn_off: alert_led
 
   # Input 3 (GPIO 34)
   - platform: gpio
     name: ${input_3_name}
+    internal: ${input_3_internal}
+    id: input_3_pin
     pin:
       number: GPIO34
       inverted: true      
@@ -148,7 +170,12 @@ binary_sensor:
     on_release:
       - if:
           condition:
-            - lambda: 'return ${input_3_triggers_alert};'
+            - lambda: |-
+                if (${input_3_triggers_alert}) {
+                  bool other_alert_active = (id(input_1_pin).state && ${input_1_triggers_alert}) || (id(input_2_pin).state && ${input_2_triggers_alert});
+                  return !other_alert_active;
+                }
+                return false;
           then:
             - switch.turn_off: alert_led
 
