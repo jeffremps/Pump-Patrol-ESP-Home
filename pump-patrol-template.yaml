@@ -218,11 +218,10 @@ sensor:
 
   - platform: template
     name: "Voltage"
-    id: current_voltage
     unit_of_measurement: "V"
     icon: "mdi:lightning-bolt"
     accuracy_decimals: 0
-    update_interval: 1s
+    update_interval: 1h
     lambda: |-
       return ${input_voltage};
 
@@ -236,7 +235,7 @@ sensor:
     accuracy_decimals: 1
     update_interval: 1s
     lambda: |-
-      return id(calibrated_pump_amps).state * id(current_voltage).state;
+      return id(calibrated_pump_amps).state * ${input_voltage};
 
 button:
   - platform: restart
