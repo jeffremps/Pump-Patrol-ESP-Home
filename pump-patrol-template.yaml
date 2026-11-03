@@ -1,4 +1,16 @@
 # base_pump_controller.yaml
+substitutions:
+  # Standardized input names with default fallback strings
+  input_1_name: "Input 1"
+  input_2_name: "Input 2"
+  input_3_name: "Input 3"
+  input_voltage: "120.0"
+
+  # Alert LED Routing Control (Defaults: Only Input 1 triggers it)
+  input_1_triggers_alert: "true"
+  input_2_triggers_alert: "false"
+  input_3_triggers_alert: "false"
+
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
@@ -48,11 +60,12 @@ switch:
     pin: GPIO14  
     restore_mode: ALWAYS_OFF
     internal: True
-    id: level_high_led
+    id: alert_led
 
 binary_sensor:
+  # Input 1 (GPIO 32)
   - platform: gpio
-    name: "Tank High"
+    name: ${input_1_name}
     pin: 
       number: GPIO32
       inverted: true
@@ -64,9 +77,17 @@ binary_sensor:
       - delayed_off: 1s
     trigger_on_initial_state: True
     on_press:
-      - switch.turn_on: level_high_led
+      - if:
+          condition:
+            - lambda: 'return ${input_1_triggers_alert};'
+          then:
+            - switch.turn_on: alert_led
     on_release:
-      - switch.turn_off: level_high_led
+      - if:
+          condition:
+            - lambda: 'return ${input_1_triggers_alert};'
+          then:
+            - switch.turn_off: alert_led
 
   - platform: template
     name: "Pump State"
@@ -79,15 +100,57 @@ binary_sensor:
         return false;
       }     
 
+  # Input 2 (GPIO 33)
   - platform: gpio
-    id: voltage_selector_pin
+    name: ${input_2_name}
+    pin:
+      number: GPIO33
+      inverted: true
+      mode:
+        input: true
+        pullup: false
+    filters:
+      - delayed_on: 1s
+      - delayed_off: 1s
+    trigger_on_initial_state: True
+    on_press:
+      - if:
+          condition:
+            - lambda: 'return ${input_2_triggers_alert};'
+          then:
+            - switch.turn_on: alert_led
+    on_release:
+      - if:
+          condition:
+            - lambda: 'return ${input_2_triggers_alert};'
+          then:
+            - switch.turn_off: alert_led
+
+  # Input 3 (GPIO 34)
+  - platform: gpio
+    name: ${input_3_name}
     pin:
       number: GPIO34
       inverted: true      
       mode:
         input: true
         pullup: false      
-    internal: true        
+    filters:
+      - delayed_on: 1s
+      - delayed_off: 1s
+    trigger_on_initial_state: True
+    on_press:
+      - if:
+          condition:
+            - lambda: 'return ${input_3_triggers_alert};'
+          then:
+            - switch.turn_on: alert_led
+    on_release:
+      - if:
+          condition:
+            - lambda: 'return ${input_3_triggers_alert};'
+          then:
+            - switch.turn_off: alert_led
 
 sensor:
   - platform: wifi_signal
@@ -134,11 +197,7 @@ sensor:
     accuracy_decimals: 0
     update_interval: 1s
     lambda: |-
-      if (id(voltage_selector_pin).state) {
-        return 240.0;     
-      } else {
-        return 120.0;     
-      }
+      return ${input_voltage};
 
   - platform: template
     name: "Pump Watts"
