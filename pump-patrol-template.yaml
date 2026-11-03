@@ -105,13 +105,15 @@ binary_sensor:
   - platform: template
     name: "Pump State"
     icon: "mdi:pump"
-    device_class: running  
+    device_class: running
+    update_interval: 1s
     lambda: |-
       if (id(calibrated_pump_amps).state >= ${running_threshold}) {
         return true;
-      } else {
+      } else if (id(calibrated_pump_amps).state <= ${stopping_threshold}) {
         return false;
-      }     
+      }
+      return {};
 
   # Input 2 (GPIO 33)
   - platform: gpio
