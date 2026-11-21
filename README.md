@@ -9,7 +9,7 @@ Create a device configuration such as `sewer-pump-device.yaml` alongside the pac
 ```yaml
 # sewer-pump-device.yaml
 substitutions:
-  device_name: "sepric-pump"
+  device_name: "septic-pump"
   friendly_name: "Septic Pump"
   api_key: "{my API Key}"
   ota_key: "{my OTA Key}"
