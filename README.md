@@ -9,8 +9,8 @@ Create a device configuration such as `sewer-pump-device.yaml` alongside the pac
 ```yaml
 # sewer-pump-device.yaml
 substitutions:
-  device_name: "sewer-pump"
-  friendly_name: "Sewer Pump"
+  device_name: "sepric-pump"
+  friendly_name: "Septic Pump"
   api_key: "{my API Key}"
   ota_key: "{my OTA Key}"
 
@@ -21,7 +21,7 @@ substitutions:
 
   # Input 1
   input_1_internal: "false" # Shows up in Home Assistant if false; hidden if true
-  input_1_name: "Tank High"
+  input_1_name: "Septic Tank High"
   input_1_triggers_alert: "true"
 
   # Input 2
