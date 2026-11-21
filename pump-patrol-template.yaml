@@ -2,7 +2,7 @@ substitutions:
   # Input 1
   input_1_internal: "false" # Changed from enabled to internal to fix parsing logic
   input_1_triggers_alert: "true"
-  input_1_name: "Tank High"
+  input_1_name: "Input 1"
 
   # Input 2
   input_2_internal: "true"
@@ -103,7 +103,7 @@ binary_sensor:
             - switch.turn_off: alert_led
 
   - platform: template
-    name: "${friendly_name} State"
+    name: "Pump State"
     icon: "mdi:pump"
     device_class: running
     lambda: |-
@@ -182,13 +182,13 @@ binary_sensor:
 
 sensor:
   - platform: wifi_signal
-    name: "${friendly_name} Wifi Strength"
+    name: "Wi-Fi Strength"
     update_interval: 60s
 
   - platform: ct_clamp
     sensor: pump_raw_adc_pin
     id: calibrated_pump_amps  
-    name: "${friendly_name} Current"
+    name: "Current"
     update_interval: 1s
     sample_duration: 200ms
     filters:
@@ -218,7 +218,7 @@ sensor:
     update_interval: 1s
 
   - platform: template
-    name: "${friendly_name} Voltage"
+    name: "Voltage"
     unit_of_measurement: "V"
     icon: "mdi:lightning-bolt"
     accuracy_decimals: 0
@@ -227,7 +227,7 @@ sensor:
       return ${input_voltage};
 
   - platform: template
-    name: "${friendly_name} Watts"
+    name: "Watts"
     id: pump_power_watts
     unit_of_measurement: "W"
     device_class: power
@@ -245,6 +245,6 @@ button:
 text_sensor:
   - platform: wifi_info
     ip_address:
-      name: ${friendly_name} IP Address
+      name: "IP Address"
     mac_address:
-      name: ${friendly_name} Mac Address
+      name: "MAC Address"
