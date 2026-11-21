@@ -218,7 +218,7 @@ sensor:
     update_interval: 1s
 
   - platform: template
-    name: "${friendly_name}Voltage"
+    name: "${friendly_name} Voltage"
     unit_of_measurement: "V"
     icon: "mdi:lightning-bolt"
     accuracy_decimals: 0
