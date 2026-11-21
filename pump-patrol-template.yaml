@@ -105,6 +105,7 @@ binary_sensor:
   - platform: template
     name: "Pump State"
     icon: "mdi:pump"
+    main_entity: true
     device_class: running
     lambda: |-
       if (id(calibrated_pump_amps).state >= ${running_threshold}) {
